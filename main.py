@@ -111,72 +111,67 @@ def ScanForContests():
 
         print("Getting new results for: " + search_query)
 
-        try:
-            r = api.request(
-                'search/tweets', {'q': search_query, 'result_type': "mixed", 'count': 100})
-            c = 0
+        r = api.request(
+            'search/tweets', {'q': search_query, 'result_type': "mixed", 'count': 100})
+        c = 0
 
-            for item in r:
+        for item in r:
 
-                c = c + 1
-                user_item = item['user']
-                screen_name = user_item['screen_name']
-                text = item['text']
-                text = text.replace("\n", "")
-                id = str(item['id'])
-                original_id = id
-                is_retweet = 0
+            c = c + 1
+            user_item = item['user']
+            screen_name = user_item['screen_name']
+            text = item['text']
+            text = text.replace("\n", "")
+            id = str(item['id'])
+            original_id = id
+            is_retweet = 0
 
-                if 'retweeted_status' in item:
+            if 'retweeted_status' in item:
 
-                    is_retweet = 1
-                    original_item = item['retweeted_status']
-                    original_id = str(original_item['id'])
-                    original_user_item = original_item['user']
-                    original_screen_name = original_user_item['screen_name']
+                is_retweet = 1
+                original_item = item['retweeted_status']
+                original_id = str(original_item['id'])
+                original_user_item = original_item['user']
+                original_screen_name = original_user_item['screen_name']
 
-                if original_id not in ignore_list:
+            if original_id not in ignore_list:
 
-                    if original_screen_name not in ignore_list:
+                if original_screen_name not in ignore_list:
 
-                        if item['retweet_count'] > 0:
+                    if item['retweet_count'] > 0:
 
-                            post_list.append(item)
-                            f_ign = open('ignorelist', 'a')
-
-                            if is_retweet:
-                                print(id + " - " + screen_name + " retweeting " +
-                                      original_id + " - " + original_screen_name + ": " + text)
-                                ignore_list.append(original_id)
-                                f_ign.write(original_id + "\n")
-                            else:
-                                print(id + " - " + screen_name + ": " + text)
-                                ignore_list.append(id)
-                                f_ign.write(id + "\n")
-
-                            f_ign.close()
-
-                    else:
+                        post_list.append(item)
+                        f_ign = open('ignorelist', 'a')
 
                         if is_retweet:
-                            print(id + " ignored: " +
-                                  original_screen_name + " on ignore list")
+                            print(id + " - " + screen_name + " retweeting " +
+                                  original_id + " - " + original_screen_name + ": " + text)
+                            ignore_list.append(original_id)
+                            f_ign.write(original_id + "\n")
                         else:
-                            print(original_screen_name + " in ignore list")
+                            print(id + " - " + screen_name + ": " + text)
+                            ignore_list.append(id)
+                            f_ign.write(id + "\n")
+
+                        f_ign.close()
 
                 else:
 
                     if is_retweet:
                         print(id + " ignored: " +
-                              original_id + " on ignore list")
+                              original_screen_name + " on ignore list")
                     else:
-                        print(id + " in ignore list")
+                        print(original_screen_name + " in ignore list")
 
-            print("Got " + str(c) + " results")
+            else:
 
-        except Exception as e:
-            print("Could not connect to TwitterAPI - are your credentials correct?")
-            print("Exception: " + e)
+                if is_retweet:
+                    print(id + " ignored: " +
+                          original_id + " on ignore list")
+                else:
+                    print(id + " in ignore list")
+
+        print("Got " + str(c) + " results")
 
 
 ScanForContests()
