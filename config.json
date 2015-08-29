@@ -1,7 +1,7 @@
 {
   "search-queries": ["RT gagner -DM -shiney"],
-  "follow-keywords": [" follow ", " follower ", " suivez "],
-  "fav-keywords": [" fav ", " favorite "],
+  "follow-keywords": ["follow", "follower", "suivez", "Follow", "FOLLOW", "Suivez"],
+  "fav-keywords": ["fav", "favorite", "Fav"],
   "scan-update-time": 1800,
   "retweet-update-time": 600,
   "consumer-key": "U8lo4eRt5FLNKpo3SrZ7J7Ebp",
