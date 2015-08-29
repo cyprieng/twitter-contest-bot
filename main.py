@@ -9,15 +9,15 @@ with open('config.json') as data_file:
     data = json.load(data_file)
 
 # These vars are loaded in from config.
-consumer_key = data["consumer-key"]
-consumer_secret = data["consumer-secret"]
-access_token_key = data["access-token-key"]
-access_token_secret = data["access-token-secret"]
-retweet_update_time = data["retweet-update-time"]
-scan_update_time = data["scan-update-time"]
-search_queries = data["search-queries"]
-follow_keywords = data["follow-keywords"]
-fav_keywords = data["fav-keywords"]
+consumer_key = data['consumer-key']
+consumer_secret = data['consumer-secret']
+access_token_key = data['access-token-key']
+access_token_secret = data['access-token-secret']
+retweet_update_time = data['retweet-update-time']
+scan_update_time = data['scan-update-time']
+search_queries = data['search-queries']
+follow_keywords = data['follow-keywords']
+fav_keywords = data['fav-keywords']
 
 # Don't edit these unless you know what you're doing.
 api = TwitterAPI(consumer_key, consumer_secret,
@@ -26,7 +26,7 @@ post_list = list()
 ignore_list = list()
 
 if os.path.isfile('ignorelist'):
-    print("Loading ignore list")
+    print('Loading ignore list')
     with open('ignorelist') as f:
         ignore_list = f.read().splitlines()
     f.close()
@@ -36,10 +36,10 @@ if os.path.isfile('ignorelist'):
 
 # Print and log the text
 def LogAndPrint(text):
-    tmp = text.replace("\n", "")
+    tmp = text.replace('\n', '')
     print(tmp)
     f_log = open('log', 'a')
-    f_log.write(tmp + "\n")
+    f_log.write(tmp + '\n')
     f_log.close()
 
 
@@ -49,14 +49,14 @@ def UpdateQueue():
     u.daemon = True
     u.start()
 
-    print("=== CHECKING RETWEET QUEUE ===")
+    print('=== CHECKING RETWEET QUEUE ===')
 
-    print("Queue length: " + str(len(post_list)))
+    print('Queue length: ' + str(len(post_list)))
 
     if len(post_list) > 0:
         post = post_list[0]
-        LogAndPrint("Retweeting: " +
-                    str(post['id']) + " " + str(post['text'].encode('utf8')))
+        LogAndPrint('Retweeting: ' +
+                    str(post['id']) + ' ' + str(post['text'].encode('utf8')))
 
         CheckForFollowRequest(post)
         CheckForFavoriteRequest(post)
@@ -75,12 +75,12 @@ def CheckForFollowRequest(item):
             api.request('friendships/create',
                         {'screen_name': item['retweeted_status']['user']['screen_name']})
             LogAndPrint(
-                "Follow: " + item['retweeted_status']['user']['screen_name'])
+                'Follow: ' + item['retweeted_status']['user']['screen_name'])
         except:
             user = item['user']
             screen_name = user['screen_name']
             api.request('friendships/create', {'screen_name': screen_name})
-            LogAndPrint("Follow: " + screen_name)
+            LogAndPrint('Follow: ' + screen_name)
 
 
 # Check if a post requires you to favorite the tweet.
@@ -92,10 +92,10 @@ def CheckForFavoriteRequest(item):
         try:
             api.request('favorites/create',
                         {'id': item['retweeted_status']['user']['id']})
-            LogAndPrint("Favorite: " + str(item['retweeted_status']['user']['id']))
+            LogAndPrint('Favorite: ' + str(item['retweeted_status']['user']['id']))
         except:
             api.request('favorites/create', {'id': item['id']})
-            LogAndPrint("Favorite: " + str(item['id']))
+            LogAndPrint('Favorite: ' + str(item['id']))
 
 
 # Scan for new contests, but not too often because of the rate limit.
@@ -104,15 +104,14 @@ def ScanForContests():
     t.daemon = True
     t.start()
 
-
-    print("=== SCANNING FOR NEW CONTESTS ===")
+    print('=== SCANNING FOR NEW CONTESTS ===')
 
     for search_query in search_queries:
 
-        print("Getting new results for: " + search_query)
+        print('Getting new results for: ' + search_query)
 
         r = api.request(
-            'search/tweets', {'q': search_query, 'result_type': "mixed", 'count': 100})
+            'search/tweets', {'q': search_query, 'result_type': 'mixed', 'count': 100})
         c = 0
 
         for item in r:
@@ -121,10 +120,11 @@ def ScanForContests():
             user_item = item['user']
             screen_name = user_item['screen_name']
             text = item['text']
-            text = text.replace("\n", "")
+            text = text.replace('\n', '')
             id = str(item['id'])
             original_id = id
             is_retweet = 0
+            ignore = False
 
             if 'retweeted_status' in item:
 
@@ -133,45 +133,53 @@ def ScanForContests():
                 original_id = str(original_item['id'])
                 original_user_item = original_item['user']
                 original_screen_name = original_user_item['screen_name']
+                text = original_item['text']
 
-            if original_id not in ignore_list:
+                # Check text of original_item
+                keywords = search_query.split(' ')
+                keywords = [x for x in keywords if not x[0] == '-']
+                if not all(x in text for x in keywords):
+                    ignore = True
 
-                if original_screen_name not in ignore_list:
+            if not ignore:
+                if original_id not in ignore_list:
 
-                    if item['retweet_count'] > 0:
+                    if original_screen_name not in ignore_list:
 
-                        post_list.append(item)
-                        f_ign = open('ignorelist', 'a')
+                        if item['retweet_count'] > 0:
+
+                            post_list.append(item)
+                            f_ign = open('ignorelist', 'a')
+
+                            if is_retweet:
+                                print(id + ' - ' + screen_name + ' retweeting ' +
+                                      original_id + ' - ' + original_screen_name + ': ' + text)
+                                ignore_list.append(original_id)
+                                f_ign.write(original_id + '\n')
+                            else:
+                                print(id + ' - ' + screen_name + ': ' + text)
+                                ignore_list.append(id)
+                                f_ign.write(id + '\n')
+
+                            f_ign.close()
+
+                    else:
 
                         if is_retweet:
-                            print(id + " - " + screen_name + " retweeting " +
-                                  original_id + " - " + original_screen_name + ": " + text)
-                            ignore_list.append(original_id)
-                            f_ign.write(original_id + "\n")
+                            print(id + ' ignored: ' +
+                                  original_screen_name + ' on ignore list')
                         else:
-                            print(id + " - " + screen_name + ": " + text)
-                            ignore_list.append(id)
-                            f_ign.write(id + "\n")
-
-                        f_ign.close()
+                            print(original_screen_name + ' in ignore list')
 
                 else:
 
                     if is_retweet:
-                        print(id + " ignored: " +
-                              original_screen_name + " on ignore list")
+                        print(id + ' ignored: ' +
+                              original_id + ' on ignore list')
                     else:
-                        print(original_screen_name + " in ignore list")
+                        print(id + ' in ignore list')
 
-            else:
-
-                if is_retweet:
-                    print(id + " ignored: " +
-                          original_id + " on ignore list")
-                else:
-                    print(id + " in ignore list")
-
-        print("Got " + str(c) + " results")
+        print('Got ' + str(c) + ' results')
 
 
 ScanForContests()
