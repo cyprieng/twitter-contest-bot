@@ -70,17 +70,24 @@ def UpdateQueue():
 # for following too aggressively
 def CheckForFollowRequest(item):
     text = item['text']
+
     if any(x in text.lower() for x in follow_keywords):
-        try:
-            api.request('friendships/create',
-                        {'screen_name': item['retweeted_status']['user']['screen_name']})
-            LogAndPrint(
-                'Follow: ' + item['retweeted_status']['user']['screen_name'])
-        except:
-            user = item['user']
-            screen_name = user['screen_name']
-            api.request('friendships/create', {'screen_name': screen_name})
-            LogAndPrint('Follow: ' + screen_name)
+        users = []
+        if 'retweeted_status' in item:
+            users.append(item['retweeted_status']['user']['screen_name'])
+        else:
+            users.append(item['user']['screen_name'])
+
+        # Add user mentioned in tweet
+        for user in item['user_mentions']:
+            users.append(user['screen_name'])
+
+        for user in users:
+            try:
+                api.request('friendships/create', {'screen_name': user})
+                LogAndPrint('Follow: ' + user)
+            except:
+                pass
 
 
 # Check if a post requires you to favorite the tweet.
@@ -110,8 +117,7 @@ def ScanForContests():
 
         print('Getting new results for: ' + search_query)
 
-        r = api.request(
-            'search/tweets', {'q': search_query, 'result_type': 'mixed', 'count': 100})
+        r = api.request('search/tweets', {'q': search_query, 'result_type': 'mixed', 'count': 100})
         c = 0
 
         for item in r:
