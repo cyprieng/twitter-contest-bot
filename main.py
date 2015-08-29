@@ -123,6 +123,7 @@ def ScanForContests():
             text = text.replace('\n', '')
             id = str(item['id'])
             original_id = id
+            original_screen_name = ''
             is_retweet = 0
             ignore = False
 
