@@ -92,10 +92,10 @@ def CheckForFavoriteRequest(item):
         try:
             api.request('favorites/create',
                         {'id': item['retweeted_status']['user']['id']})
-            LogAndPrint("Favorite: " + item['retweeted_status']['user']['id'])
+            LogAndPrint("Favorite: " + str(item['retweeted_status']['user']['id']))
         except:
             api.request('favorites/create', {'id': item['id']})
-            LogAndPrint("Favorite: " + item['id'])
+            LogAndPrint("Favorite: " + str(item['id']))
 
 
 # Scan for new contests, but not too often because of the rate limit.
