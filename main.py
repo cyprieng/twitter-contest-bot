@@ -20,6 +20,7 @@ scan_update_time = data['scan-update-time']
 search_queries = data['search-queries']
 follow_keywords = data['follow-keywords']
 fav_keywords = data['fav-keywords']
+ignore_users = data['ignore-users']
 
 # Don't edit these unless you know what you're doing.
 api = TwitterAPI(consumer_key, consumer_secret,
@@ -157,7 +158,7 @@ def ScanForContests():
             text = text.replace('\n', '')
             id = str(item['id'])
             original_id = id
-            original_screen_name = ''
+            original_screen_name = user_item['screen_name']
             is_retweet = 0
             ignore = False
 
@@ -179,7 +180,7 @@ def ScanForContests():
             if not ignore:
                 if original_id not in ignore_list:
 
-                    if original_screen_name not in ignore_list:
+                    if original_screen_name not in ignore_list and original_screen_name not in ignore_users:
 
                         if item['retweet_count'] > 0:
 

@@ -2,6 +2,7 @@
   "search-queries": ["RT gagner -DM -shiney"],
   "follow-keywords": ["follow", "follower", "suivez", "Follow", "FOLLOW", "Suivez"],
   "fav-keywords": ["fav", "favorite", "Fav"],
+  "ignore-users": ["blogconcours"],
   "scan-update-time": 1800,
   "retweet-update-time": 600,
   "quote-update-time": 1600,
