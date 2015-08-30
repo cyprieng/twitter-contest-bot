@@ -79,7 +79,7 @@ def CheckForFollowRequest(item):
             users.append(item['user']['screen_name'])
 
         # Add user mentioned in tweet
-        for user in item['user_mentions']:
+        for user in item['entities']['user_mentions']:
             users.append(user['screen_name'])
 
         for user in users:
