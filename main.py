@@ -58,8 +58,17 @@ def post_quote():
 
         with open(quote_file) as f:
             for i, line in enumerate(f):
-                if i == quote_index - 1:
-                    api.request('statuses/update', {'status': line[0:139]})
+                if i == quote_index - 1:  # Tweet quote
+                    start = 0
+                    stop = 139
+                    while True:
+                        if start + 140 < len(line):  # It is only the beginning...
+                            api.request('statuses/update', {'status': line[start:stop - 3] + '...'})
+                            start += 136
+                            stop += 136
+                        else:  # End of the quote
+                            api.request('statuses/update', {'status': line[start:stop]})
+                            break
 
 
 # Update the Retweet queue (this prevents too many retweets happening at once.)
