@@ -3,6 +3,7 @@ import threading
 import time
 import json
 import os.path
+import random
 
 # Load our configuration from the JSON file.
 with open('config.json') as data_file:
@@ -14,6 +15,7 @@ consumer_secret = data['consumer-secret']
 access_token_key = data['access-token-key']
 access_token_secret = data['access-token-secret']
 retweet_update_time = data['retweet-update-time']
+quote_update_time = data['quote-update-time']
 scan_update_time = data['scan-update-time']
 search_queries = data['search-queries']
 follow_keywords = data['follow-keywords']
@@ -41,6 +43,23 @@ def LogAndPrint(text):
     f_log = open('log', 'a')
     f_log.write(tmp + '\n')
     f_log.close()
+
+
+def post_quote(self):
+        """
+        Post a random quote (avoid beeing flagged as spam...)
+        """
+        u = threading.Timer(quote_update_time, post_quote)
+        u.daemon = True
+        u.start()
+
+        quote_index = random.randint(1, 76233)
+        quote_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'quotes.txt')
+
+        with open(quote_file) as f:
+            for i, line in enumerate(f):
+                if i == quote_index - 1:
+                    api.request('statuses/update', {'status': line[0:139]})
 
 
 # Update the Retweet queue (this prevents too many retweets happening at once.)
@@ -189,6 +208,7 @@ def ScanForContests():
         print('Got ' + str(c) + ' results')
 
 
+post_quote()
 ScanForContests()
 UpdateQueue()
 
