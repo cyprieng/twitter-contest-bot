@@ -45,7 +45,7 @@ def LogAndPrint(text):
     f_log.close()
 
 
-def post_quote(self):
+def post_quote():
         """
         Post a random quote (avoid beeing flagged as spam...)
         """
