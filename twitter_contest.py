@@ -51,10 +51,10 @@ class TwitterContest():
         self.ignore_list = IgnoreList()
 
         if os.path.isfile('ignorelist'):
-            logger.info('Loading ignore list...')
+            logger.info(u'Loading ignore list...')
             with open('ignorelist', 'r') as f:
                 self.ignore_list = IgnoreList(f.read().splitlines())
-            logger.info('Loaded {0} elements in ignore list'.format(self.ignore_list))
+            logger.info(u'Loaded {0} elements in ignore list'.format(self.ignore_list))
 
     def post_quote(self):
             """Post a random quote (avoid beeing flagged as spam...).
@@ -65,7 +65,7 @@ class TwitterContest():
             quote_index = random.randint(1, 76233)
             quote_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'quotes.txt')
 
-            logger.info('Tweeting quote nb {0}'.format(quote_index))
+            logger.info(u'Tweeting quote nb {0}'.format(quote_index))
 
             with open(quote_file) as f:
                 for i, line in enumerate(f):
@@ -87,12 +87,12 @@ class TwitterContest():
         t = threading.Timer(self.retweet_update_time, self.update_rt_queue)
         t.start()
 
-        logger.info('=== CHECKING RETWEET QUEUE ===')
-        logger.debug('Queue length: {}'.format(str(len(self.rt_list))))
+        logger.info(u'=== CHECKING RETWEET QUEUE ===')
+        logger.debug(u'Queue length: {}'.format(str(len(self.rt_list))))
 
         if len(self.rt_list) > 0:
             rt = self.rt_list[0]
-            logger.debug('Retweeting {0}: {1}'.format(str(rt['id']), str(rt['text'].encode('utf8'))))
+            logger.debug(u'Retweeting {0}: {1}'.format(str(rt['id']), str(rt['text'].encode('utf8'))))
 
             self.check_for_follow(rt)
             self.check_for_favorite(rt)
@@ -122,7 +122,7 @@ class TwitterContest():
             for user in users:
                 try:
                     self.api.request('friendships/create', {'screen_name': user})
-                    logger.info('Follow: {}'.format(user))
+                    logger.info(u'Follow: {}'.format(user))
                 except:
                     pass
 
@@ -136,10 +136,10 @@ class TwitterContest():
         if any(x in text.lower() for x in self.fav_keywords):
             try:
                 self.api.request('favorites/create', {'id': tweet['retweeted_status']['user']['id']})
-                logger.info('Favorite: {}'.format(str(tweet['retweeted_status']['user']['id'])))
+                logger.info(u'Favorite: {}'.format(str(tweet['retweeted_status']['user']['id'])))
             except:
                 self.api.request('favorites/create', {'id': tweet['id']})
-                logger.info('Favorite: {}'.format(str(tweet['id'])))
+                logger.info(u'Favorite: {}'.format(str(tweet['id'])))
 
     def scan_for_contests(self):
         """Scan for new contests.
@@ -147,10 +147,10 @@ class TwitterContest():
         t = threading.Timer(self.scan_update_time, self.scan_for_contests)
         t.start()
 
-        logger.info('=== SCANNING FOR NEW CONTESTS ===')
+        logger.info(u'=== SCANNING FOR NEW CONTESTS ===')
 
         for search_query in self.search_queries:
-            logger.info('Getting new results for: {}'.format(search_query))
+            logger.info(u'Getting new results for: {}'.format(search_query))
 
             request = self.api.request('search/tweets', {'q': search_query, 'result_type': 'mixed', 'count': 100})
             counter = 0
@@ -182,14 +182,14 @@ class TwitterContest():
                         if user_screen_name not in self.ignore_list and user_screen_name not in self.ignore_users:
                             if tweet['retweet_count'] > 0:  # The tweet already has RT (credibility)
                                 self.rt_list.append(tweet)
-                                logger.info('Added to queue: {0} - {1}: {2}'.format(id, user_screen_name, text))
+                                logger.info(u'Added to queue: {0} - {1}: {2}'.format(id, user_screen_name, text))
                                 self.ignore_list.append(id)
                         else:
-                            logger.info('{} in ignore list'.format(user_screen_name))
+                            logger.info(u'{} in ignore list'.format(user_screen_name))
                     else:
-                        logger.info('{} in ignore list'.format(id))
+                        logger.info(u'{} in ignore list'.format(id))
 
-            logger.info('Got {} results.'.format(str(counter)))
+            logger.info(u'Got {} results.'.format(str(counter)))
 
     def run(self):
         """Run the twitter contest bot.
