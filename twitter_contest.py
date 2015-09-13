@@ -88,16 +88,16 @@ class TwitterContest():
         t.start()
 
         logger.info(u'=== CHECKING RETWEET QUEUE ===')
-        logger.debug(u'Queue length: {}'.format(str(len(self.rt_list))))
+        logger.debug(u'Queue length: {}'.format(unicode(len(self.rt_list))))
 
         if len(self.rt_list) > 0:
             rt = self.rt_list[0]
-            logger.debug(u'Retweeting {0}: {1}'.format(str(rt['id']), str(rt['text'].encode('utf8'))))
+            logger.debug(u'Retweeting {0}: {1}'.format(unicode(rt['id']), unicode(rt['text'])))
 
             self.check_for_follow(rt)
             self.check_for_favorite(rt)
 
-            self.api.request('statuses/retweet/:{}'.format(str(rt['id'])))
+            self.api.request('statuses/retweet/:{}'.format(unicode(rt['id'])))
             self.rt_list.pop(0)
 
     def check_for_follow(self, tweet):
@@ -136,10 +136,10 @@ class TwitterContest():
         if any(x in text.lower() for x in self.fav_keywords):
             try:
                 self.api.request('favorites/create', {'id': tweet['retweeted_status']['user']['id']})
-                logger.info(u'Favorite: {}'.format(str(tweet['retweeted_status']['user']['id'])))
+                logger.info(u'Favorite: {}'.format(unicode(tweet['retweeted_status']['user']['id'])))
             except:
                 self.api.request('favorites/create', {'id': tweet['id']})
-                logger.info(u'Favorite: {}'.format(str(tweet['id'])))
+                logger.info(u'Favorite: {}'.format(unicode(tweet['id'])))
 
     def scan_for_contests(self):
         """Scan for new contests.
@@ -161,9 +161,9 @@ class TwitterContest():
                 # Get tweet data
                 if 'retweeted_status' in tweet:  # The tweet is a RT
                     original = tweet['retweeted_status']
-                    id = str(original['id'])
+                    id = unicode(original['id'])
                     user = original['user']
-                    user_screen_name = original['screen_name']
+                    user_screen_name = user['screen_name']
                     text = original['text']
 
                     # Check text of original_item
@@ -175,7 +175,7 @@ class TwitterContest():
                     user = tweet['user']
                     user_screen_name = user['screen_name']
                     text = tweet['text'].replace('\n', '')
-                    id = str(tweet['id'])
+                    id = unicode(tweet['id'])
 
                 if not ignore:
                     if id not in self.ignore_list:
@@ -189,7 +189,7 @@ class TwitterContest():
                     else:
                         logger.info(u'{} in ignore list'.format(id))
 
-            logger.info(u'Got {} results.'.format(str(counter)))
+            logger.info(u'Got {} results.'.format(unicode(counter)))
 
     def run(self):
         """Run the twitter contest bot.
