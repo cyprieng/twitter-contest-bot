@@ -6,8 +6,10 @@ import random
 import logging
 
 
-logging.basicConfig()
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
 logger = logging.getLogger(__name__)
+logger.addHandler(ch)
 
 
 class IgnoreList(list):
