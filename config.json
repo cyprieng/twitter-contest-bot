@@ -6,8 +6,8 @@
   "scan-update-time": 1800,
   "retweet-update-time": 600,
   "quote-update-time": 1600,
-  "consumer-key": "U8lo4eRt5FLNKpo3SrZ7J7Ebp",
-  "consumer-secret": "QyuQkAeEHGc7TQRZ8yZQYFMHc3Fh6qFdUpEkxx02tm5lo4hRki",
-  "access-token-key": "3424055837-aFpCzbY6tMwb5mzFnqIyLV5HjWvNHCTRFRSPDgT",
-  "access-token-secret": "dkqQ6ISIAYd1xUoMahQM7nfN5FBNpptIrBq8syyoqfRTa"
+  "consumer-key": "xxxxxx",
+  "consumer-secret": "xxxxx",
+  "access-token-key": "xxxxxx",
+  "access-token-secret": "xxxxxx"
 }
